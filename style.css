@@ -1,0 +1,628 @@
+/* ==========================================================================
+   PINBOARD — a corkboard-styled note app
+   Design tokens live here as CSS custom properties.
+   ========================================================================== */
+
+:root {
+  /* Board (background) */
+  --board: #3e362e;
+  --board-deep: #332c25;
+  --board-line: rgba(255, 255, 255, 0.05);
+
+  /* Paper colors (note card backgrounds) */
+  --paper-default: #faf6ee;
+  --paper-butter: #f5e6a8;
+  --paper-mint: #c8e6d0;
+  --paper-sky: #bee3f0;
+  --paper-blossom: #f3d0de;
+  --paper-lilac: #dcd0f0;
+
+  /* Ink & accents */
+  --ink: #2b2420;
+  --ink-soft: #6b6055;
+  --accent: #c9a961;
+  --accent-deep: #a4813e;
+  --danger: #b5544a;
+
+  /* Chrome */
+  --panel: #463d34;
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --text-on-panel: #f1e9dd;
+  --text-on-panel-soft: #c9bcac;
+
+  /* Type */
+  --font-display: "Caveat", cursive;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Misc */
+  --radius: 10px;
+  --shadow-card: 0 6px 16px rgba(0, 0, 0, 0.28), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-card-hover: 0 12px 28px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.22);
+  --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.5);
+  --transition: 160ms ease;
+}
+
+/* ==========================================================================
+   Reset & base
+   ========================================================================== */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,0.035) 1px, transparent 0) 0 0 / 22px 22px,
+    var(--board);
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+textarea, input {
+  font-family: inherit;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Top bar
+   ========================================================================== */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 24px;
+  background: var(--board-deep);
+  border-bottom: 1px solid var(--board-line);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar__pin {
+  font-size: 22px;
+  transform: rotate(-12deg);
+}
+
+.topbar__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--text-on-panel);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.topbar__search {
+  flex: 1;
+  max-width: 520px;
+}
+
+.topbar__search input {
+  width: 100%;
+  border: 1px solid var(--panel-border);
+  background: var(--panel);
+  color: var(--text-on-panel);
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-size: 14px;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.topbar__search input::placeholder { color: var(--text-on-panel-soft); }
+
+.topbar__search input:focus {
+  background: #503f2f;
+  border-color: var(--accent);
+}
+
+.topbar__menu-toggle {
+  display: none;
+  margin-left: auto;
+  color: var(--text-on-panel);
+}
+
+/* ==========================================================================
+   Icon buttons & tooltips
+   ========================================================================== */
+.icon-btn {
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background var(--transition), color var(--transition);
+}
+
+.icon-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--ink);
+}
+
+/* Custom tooltip, appears above the button on hover/focus */
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #201a15;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 5px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition), transform var(--transition);
+  z-index: 30;
+}
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ==========================================================================
+   Layout: sidebar + board
+   ========================================================================== */
+.layout {
+  display: flex;
+  align-items: flex-start;
+  min-height: calc(100vh - 65px);
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 65px;
+}
+
+.sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-on-panel-soft);
+  padding: 11px 16px;
+  border-radius: 0 999px 999px 0;
+  font-size: 14.5px;
+  font-weight: 500;
+  text-align: left;
+  transition: background var(--transition), color var(--transition);
+}
+
+.sidebar__item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-on-panel);
+}
+
+.sidebar__item.is-active {
+  background: var(--accent);
+  color: #241d13;
+  font-weight: 600;
+}
+
+.sidebar__item svg { flex-shrink: 0; }
+
+/* ==========================================================================
+   Board / composer
+   ========================================================================== */
+.board {
+  flex: 1;
+  padding: 32px 36px 80px;
+}
+
+.composer {
+  max-width: 600px;
+  margin: 0 auto 40px;
+}
+
+.composer__form {
+  background: var(--paper-default);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 14px 18px;
+  transition: box-shadow var(--transition);
+}
+
+.composer__form:focus-within {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.composer__title {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.composer__title:focus { outline: none; }
+
+.composer__body {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-size: 15px;
+  color: var(--ink);
+  line-height: 1.5;
+  min-height: 24px;
+  font-family: var(--font-body);
+}
+.composer__body:focus { outline: none; }
+
+.composer__toolbar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.composer.is-open .composer__toolbar { display: flex; }
+
+.composer__colors {
+  display: flex;
+  gap: 8px;
+}
+
+.color-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  transition: transform var(--transition), border-color var(--transition);
+  position: relative;
+}
+.color-swatch:hover { transform: scale(1.12); }
+.color-swatch.is-selected {
+  border-color: var(--ink);
+}
+.color-swatch.is-selected::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--ink);
+}
+
+.composer__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn {
+  border: none;
+  border-radius: 6px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background var(--transition), transform 60ms ease;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn--primary {
+  background: var(--accent);
+  color: #241d13;
+}
+.btn--primary:hover { background: var(--accent-deep); }
+
+/* ==========================================================================
+   Notes grid
+   ========================================================================== */
+.notes-grid {
+  column-width: 240px;
+  column-gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-on-panel-soft);
+  font-family: var(--font-display);
+  font-size: 24px;
+  margin-top: 60px;
+}
+
+.note-card {
+  break-inside: avoid;
+  margin-bottom: 20px;
+  background: var(--paper-default);
+  border-radius: 4px 4px var(--radius) var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 20px 16px 12px;
+  position: relative;
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+
+/* Slight alternating tilt gives the "pinned to a board" signature look */
+.note-card:nth-child(3n+1) { transform: rotate(-0.6deg); }
+.note-card:nth-child(3n+2) { transform: rotate(0.5deg); }
+.note-card:nth-child(3n)   { transform: rotate(-0.3deg); }
+
+.note-card:hover,
+.note-card:focus-within {
+  box-shadow: var(--shadow-card-hover);
+  transform: rotate(0deg) translateY(-2px);
+  z-index: 2;
+}
+
+/* Washi tape strip — the signature element */
+.note-card__tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 64px;
+  height: 22px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--accent),
+    var(--accent) 6px,
+    var(--accent-deep) 6px,
+    var(--accent-deep) 12px
+  );
+  opacity: 0.85;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.25);
+  border-radius: 1px;
+}
+
+.note-card__title {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 600;
+  margin: 4px 0 4px;
+  color: var(--ink);
+  word-break: break-word;
+}
+.note-card__title:empty { display: none; }
+
+.note-card__body {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0 0 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.note-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.note-card__date {
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.note-card__actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.note-card:hover .note-card__actions,
+.note-card:focus-within .note-card__actions {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Modal (full note editor)
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 16, 12, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+}
+
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--paper-default);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-modal);
+  padding: 28px 26px 18px;
+  position: relative;
+}
+
+.modal__tape {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 84px;
+  height: 26px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--accent),
+    var(--accent) 6px,
+    var(--accent-deep) 6px,
+    var(--accent-deep) 12px
+  );
+  box-shadow: 0 2px 3px rgba(0,0,0,0.25);
+}
+
+.modal__title {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.modal__title:focus { outline: none; }
+
+.modal__body {
+  display: block;
+  width: 100%;
+  min-height: 160px;
+  border: none;
+  background: transparent;
+  resize: vertical;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+.modal__body:focus { outline: none; }
+
+.modal__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.modal__meta {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.modal__footer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-top: 14px;
+  margin-top: 6px;
+}
+
+.modal__footer .btn { margin-left: auto; }
+
+/* ==========================================================================
+   Toast (undo delete)
+   ========================================================================== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #201a15;
+  color: #f1e9dd;
+  padding: 12px 12px 12px 18px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 13.5px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.4);
+  z-index: 60;
+}
+.toast[hidden] { display: none; }
+
+.toast__action {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 8px;
+}
+.toast__action:hover { text-decoration: underline; }
+
+/* ==========================================================================
+   Note colors — applied via inline style variable from JS
+   ========================================================================== */
+.note-card[data-color="default"], .composer__form[data-color="default"], .modal[data-color="default"] { background: var(--paper-default); }
+.note-card[data-color="butter"], .composer__form[data-color="butter"], .modal[data-color="butter"] { background: var(--paper-butter); }
+.note-card[data-color="mint"], .composer__form[data-color="mint"], .modal[data-color="mint"] { background: var(--paper-mint); }
+.note-card[data-color="sky"], .composer__form[data-color="sky"], .modal[data-color="sky"] { background: var(--paper-sky); }
+.note-card[data-color="blossom"], .composer__form[data-color="blossom"], .modal[data-color="blossom"] { background: var(--paper-blossom); }
+.note-card[data-color="lilac"], .composer__form[data-color="lilac"], .modal[data-color="lilac"] { background: var(--paper-lilac); }
+
+/* ==========================================================================
+   Responsiveness
+   ========================================================================== */
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed;
+    left: -240px;
+    top: 65px;
+    height: calc(100vh - 65px);
+    background: var(--board-deep);
+    z-index: 15;
+    transition: left var(--transition);
+    box-shadow: 4px 0 16px rgba(0,0,0,0.3);
+  }
+  .sidebar.is-open { left: 0; }
+  .topbar__menu-toggle { display: inline-flex; }
+  .board { padding: 24px 18px 80px; }
+}
+
+@media (max-width: 560px) {
+  .topbar { gap: 12px; padding: 12px 14px; }
+  .topbar__title { font-size: 26px; }
+  .notes-grid { column-width: 100%; }
+  .modal { padding: 22px 18px 16px; }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
