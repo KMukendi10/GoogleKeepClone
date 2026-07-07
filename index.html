@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kazadi Google Keep</title>
+  <meta name="description" content="A corkboard-style note taking app: pin notes, tape them up, archive what's done." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===================== HEADER / TOP BAR ===================== -->
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="topbar__pin" aria-hidden="true">📌</span>
+      <h1 class="topbar__title">Pinboard</h1>
+    </div>
+
+    <div class="topbar__search">
+      <label for="searchInput" class="visually-hidden">Search notes</label>
+      <input type="search" id="searchInput" placeholder="Search the board…" autocomplete="off" />
+    </div>
+
+    <button id="menuToggle" class="icon-btn topbar__menu-toggle" data-tooltip="Show menu" aria-label="Toggle sidebar">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+    </button>
+  </header>
+
+  <div class="layout">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <nav class="sidebar" id="sidebar" aria-label="Board sections">
+      <button class="sidebar__item is-active" data-view="notes">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 4h16v16H4z M4 9h16" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <span>Notes</span>
+      </button>
+      <button class="sidebar__item" data-view="archive">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 6h18v3H3zM5 9v11h14V9M10 13h4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <span>Archive</span>
+      </button>
+    </nav>
+
+    <!-- ===================== MAIN BOARD ===================== -->
+    <main class="board" id="board">
+
+      <!-- Composer: click to expand into a full note form -->
+      <section class="composer" id="composer" aria-label="Create a new note">
+        <form id="composerForm" class="composer__form">
+          <input
+            type="text"
+            id="composerTitle"
+            class="composer__title"
+            placeholder="Title"
+            autocomplete="off"
+          />
+          <textarea
+            id="composerBody"
+            class="composer__body"
+            placeholder="Take a note…"
+            rows="1"
+          ></textarea>
+
+          <div class="composer__toolbar">
+            <div class="composer__colors" id="composerColors" role="radiogroup" aria-label="Note color"></div>
+            <div class="composer__actions">
+              <button type="button" class="icon-btn" id="composerCloseBtn" data-tooltip="Close" aria-label="Close composer">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+              <button type="submit" class="btn btn--primary" id="composerSaveBtn">Save</button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Empty state -->
+      <p class="empty-state" id="emptyState" hidden></p>
+
+      <!-- Notes grid -->
+      <section class="notes-grid" id="notesGrid" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <!-- ===================== NOTE CARD TEMPLATE ===================== -->
+  <template id="noteCardTemplate">
+    <article class="note-card" tabindex="0">
+      <div class="note-card__tape" aria-hidden="true"></div>
+      <h3 class="note-card__title"></h3>
+      <p class="note-card__body"></p>
+      <div class="note-card__footer">
+        <time class="note-card__date"></time>
+        <div class="note-card__actions">
+          <button class="icon-btn note-card__archive" data-tooltip="Archive" aria-label="Archive note">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path d="M3 6h18v3H3zM5 9v11h14V9M10 13h4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="icon-btn note-card__unarchive" data-tooltip="Restore" aria-label="Restore note" hidden>
+            <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 20V9M6 14l6-6 6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="icon-btn note-card__delete" data-tooltip="Delete forever" aria-label="Delete note">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <!-- ===================== EDIT MODAL ===================== -->
+  <div class="modal-overlay" id="modalOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitleLabel">
+      <div class="modal__tape" aria-hidden="true"></div>
+      <input type="text" id="modalTitle" class="modal__title" placeholder="Title" aria-label="Note title" />
+      <label id="modalTitleLabel" class="visually-hidden">Edit note</label>
+      <textarea id="modalBody" class="modal__body" placeholder="Take a note…" aria-label="Note content"></textarea>
+
+      <div class="modal__toolbar">
+        <div class="composer__colors" id="modalColors" role="radiogroup" aria-label="Note color"></div>
+        <div class="modal__meta" id="modalMeta"></div>
+      </div>
+
+      <div class="modal__footer">
+        <button class="icon-btn" id="modalArchiveBtn" data-tooltip="Archive" aria-label="Archive note">
+          <svg viewBox="0 0 24 24" width="19" height="19"><path d="M3 6h18v3H3zM5 9v11h14V9M10 13h4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" id="modalDeleteBtn" data-tooltip="Delete forever" aria-label="Delete note">
+          <svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="btn btn--primary" id="modalCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TOAST (undo delete etc.) ===================== -->
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+    <span id="toastMessage"></span>
+    <button class="toast__action" id="toastActionBtn"></button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
