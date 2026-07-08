@@ -1,16 +1,16 @@
 /**
- * PINBOARD — a simplified Google Keep clone
+ * KEEP CLONE — styled after Google Keep
  * ------------------------------------------------------------------
- * Everything lives in one file for a project of this size, but it is
- * organized into clear sections:
+ * Organized into clear sections:
  *   1. Constants & state
  *   2. Persistence (localStorage)
  *   3. Rendering (notes grid, note cards)
  *   4. Composer (create note)
  *   5. Modal (edit note)
  *   6. Note actions (archive / unarchive / delete / undo)
- *   7. Search & view switching (Notes vs Archive)
- *   8. Event wiring / init
+ *   7. Search & view switching (Notes vs Archive, list vs grid)
+ *   8. Chrome (sidebar expand, refresh, color popovers)
+ *   9. Event wiring / init
  * ------------------------------------------------------------------
  */
 
@@ -21,15 +21,18 @@
    * 1. Constants & state
    * ------------------------------------------------------------------ */
 
-  const STORAGE_KEY = "pinboard.notes.v1";
+  const STORAGE_KEY = "keep-clone.notes.v1";
 
   const COLORS = [
     { id: "default", label: "Default" },
-    { id: "butter", label: "Butter" },
+    { id: "coral", label: "Coral" },
+    { id: "sand", label: "Sand" },
     { id: "mint", label: "Mint" },
-    { id: "sky", label: "Sky" },
+    { id: "sage", label: "Sage" },
+    { id: "storm", label: "Storm" },
+    { id: "dusk", label: "Dusk" },
     { id: "blossom", label: "Blossom" },
-    { id: "lilac", label: "Lilac" },
+    { id: "clay", label: "Clay" },
   ];
 
   /** @type {{id:string,title:string,body:string,color:string,archived:boolean,createdAt:number,updatedAt:number}[]} */
@@ -46,6 +49,9 @@
 
   /** Pending delete used to support "Undo" in the toast */
   let pendingDelete = null; // { note, index, timeoutId }
+
+  /** "grid" | "list" */
+  let layoutMode = "grid";
 
   /* DOM references, grabbed once on init */
   const dom = {};
@@ -78,9 +84,9 @@
     return [
       {
         id: crypto.randomUUID(),
-        title: "Welcome to Pinboard",
-        body: "Click \"Take a note…\" to jot something down. Hover a card to archive, delete, or open it for full editing.",
-        color: "butter",
+        title: "Welcome",
+        body: "Click \"Take a note…\" to jot something down. Hover a note to archive or delete it, or click it to open the full editor.",
+        color: "sand",
         archived: false,
         createdAt: now,
         updatedAt: now,
@@ -97,8 +103,8 @@
       {
         id: crypto.randomUUID(),
         title: "Idea",
-        body: "A corkboard where finished notes get pinned to an archive instead of vanishing.",
-        color: "sky",
+        body: "Notes get archived instead of deleted when you're done with them, so nothing important disappears by accident.",
+        color: "storm",
         archived: true,
         createdAt: now - 1000 * 60 * 60 * 24,
         updatedAt: now - 1000 * 60 * 60 * 24,
@@ -119,14 +125,13 @@
   }
 
   function formatDate(timestamp) {
-    return new Date(timestamp).toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-      ...(new Date(timestamp).getFullYear() !== new Date().getFullYear() && { year: "numeric" }),
-    });
+    const d = new Date(timestamp);
+    const opts = { month: "short", day: "numeric" };
+    if (d.getFullYear() !== new Date().getFullYear()) opts.year = "numeric";
+    return d.toLocaleDateString(undefined, opts);
   }
 
-  /** Builds a row of color swatch buttons and wires selection. Returns nothing; mutates `container`. */
+  /** Builds a grid of color swatch buttons and wires selection. */
   function buildColorPicker(container, selectedColor, onSelect) {
     container.innerHTML = "";
     COLORS.forEach((color) => {
@@ -172,18 +177,18 @@
       );
     }
 
-    // Newest first
     visible = visible.slice().sort((a, b) => b.updatedAt - a.updatedAt);
 
     dom.notesGrid.innerHTML = "";
+    dom.notesGrid.classList.toggle("is-list-view", layoutMode === "list");
 
     if (visible.length === 0) {
       dom.emptyState.hidden = false;
-      dom.emptyState.textContent = searchQuery
+      dom.emptyStateText.textContent = searchQuery
         ? "No notes match your search."
         : isArchiveView
         ? "Nothing archived yet."
-        : "Your board is empty — take a note above.";
+        : "Notes you add appear here";
     } else {
       dom.emptyState.hidden = true;
       const fragment = document.createDocumentFragment();
@@ -217,7 +222,6 @@
       unarchiveBtn.hidden = false;
     }
 
-    // Open the modal editor when the card body (not an action button) is clicked
     node.addEventListener("click", (e) => {
       if (e.target.closest(".note-card__actions")) return;
       openModal(note.id);
@@ -252,10 +256,7 @@
   let composerColor = "default";
 
   function initComposer() {
-    buildColorPicker(dom.composerColors, composerColor, (color) => {
-      composerColor = color;
-      dom.composerFormEl.dataset.color = color;
-    });
+    refreshComposerColorPicker();
 
     dom.composerTitle.addEventListener("focus", openComposer);
     dom.composerBody.addEventListener("focus", openComposer);
@@ -265,19 +266,30 @@
       dom.composerBody.style.height = `${dom.composerBody.scrollHeight}px`;
     });
 
-    dom.composerCloseBtn.addEventListener("click", closeComposer);
+    dom.composerCloseBtn.addEventListener("click", createNoteFromComposer);
 
     dom.composerForm.addEventListener("submit", (e) => {
       e.preventDefault();
       createNoteFromComposer();
     });
 
+    dom.composerColorBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      togglePopover(dom.composerColorPopover, dom.composerColorBtn);
+    });
+
     // Clicking outside the open composer closes (and saves, if there's content)
     document.addEventListener("click", (e) => {
+      if (dom.composer.contains(e.target)) return;
       if (!dom.composer.classList.contains("is-open")) return;
-      if (!dom.composer.contains(e.target)) {
-        createNoteFromComposer();
-      }
+      createNoteFromComposer();
+    });
+  }
+
+  function refreshComposerColorPicker() {
+    buildColorPicker(dom.composerColors, composerColor, (color) => {
+      composerColor = color;
+      dom.composerFormEl.dataset.color = color;
     });
   }
 
@@ -289,12 +301,10 @@
     dom.composerForm.reset();
     dom.composerBody.style.height = "auto";
     dom.composer.classList.remove("is-open");
+    dom.composerColorPopover.hidden = true;
     composerColor = "default";
     dom.composerFormEl.dataset.color = "default";
-    buildColorPicker(dom.composerColors, composerColor, (color) => {
-      composerColor = color;
-      dom.composerFormEl.dataset.color = color;
-    });
+    refreshComposerColorPicker();
   }
 
   function createNoteFromComposer() {
@@ -347,6 +357,11 @@
       deleteNote(activeModalNoteId);
       closeModal();
     });
+
+    dom.modalColorBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      togglePopover(dom.modalColorPopover, dom.modalColorBtn);
+    });
   }
 
   function openModal(noteId) {
@@ -373,7 +388,6 @@
 
   function closeModal() {
     if (activeModalNoteId) {
-      // Persist any in-progress edits when the modal closes
       updateActiveNote({
         title: dom.modalTitle.value.trim(),
         body: dom.modalBody.value.trim(),
@@ -381,6 +395,7 @@
     }
     activeModalNoteId = null;
     dom.modalOverlay.hidden = true;
+    dom.modalColorPopover.hidden = true;
     render();
   }
 
@@ -414,7 +429,6 @@
     saveNotes();
     render();
 
-    // Offer a short window to undo the delete
     if (pendingDelete) clearTimeout(pendingDelete.timeoutId);
     pendingDelete = {
       note: removed,
@@ -475,6 +489,7 @@
 
   function initSidebar() {
     dom.sidebarItems.forEach((item) => {
+      if (item.classList.contains("is-disabled")) return;
       item.addEventListener("click", () => {
         dom.sidebarItems.forEach((el) => el.classList.remove("is-active"));
         item.classList.add("is-active");
@@ -483,27 +498,82 @@
         dom.sidebar.classList.remove("is-open"); // close mobile drawer after choosing
       });
     });
+  }
 
+  /* ------------------------------------------------------------------
+   * 8. Chrome: sidebar expand, refresh, view toggle, popovers
+   * ------------------------------------------------------------------ */
+
+  function initMenuToggle() {
     dom.menuToggle.addEventListener("click", () => {
-      dom.sidebar.classList.toggle("is-open");
+      // On narrow screens this behaves as a drawer; on wide screens it
+      // expands the icon rail into a labeled sidebar, matching Keep.
+      if (window.matchMedia("(max-width: 900px)").matches) {
+        dom.sidebar.classList.toggle("is-open");
+      } else {
+        dom.sidebar.classList.toggle("is-expanded");
+      }
+    });
+  }
+
+  function initRefresh() {
+    dom.refreshBtn.addEventListener("click", () => {
+      loadNotes();
+      render();
+      showToast("Refreshed.", null);
+    });
+  }
+
+  function initViewToggle() {
+    dom.viewToggleBtn.addEventListener("click", () => {
+      layoutMode = layoutMode === "grid" ? "list" : "grid";
+      dom.viewToggleBtn.setAttribute(
+        "data-tooltip",
+        layoutMode === "grid" ? "List view" : "Grid view"
+      );
+      render();
+    });
+  }
+
+  function togglePopover(popoverEl, triggerBtn) {
+    const willOpen = popoverEl.hidden;
+    // Close any other open popovers first
+    document.querySelectorAll(".color-popover").forEach((p) => (p.hidden = true));
+    popoverEl.hidden = !willOpen;
+    triggerBtn.setAttribute("aria-expanded", String(willOpen));
+  }
+
+  function initPopoverDismiss() {
+    document.addEventListener("click", (e) => {
+      document.querySelectorAll(".color-popover").forEach((popover) => {
+        if (popover.hidden) return;
+        const trigger = popover.id === "composerColorPopover" ? dom.composerColorBtn : dom.modalColorBtn;
+        if (!popover.contains(e.target) && e.target !== trigger) {
+          popover.hidden = true;
+          trigger.setAttribute("aria-expanded", "false");
+        }
+      });
     });
   }
 
   /* ------------------------------------------------------------------
-   * 8. Init
+   * 9. Init
    * ------------------------------------------------------------------ */
 
   function cacheDom() {
     dom.notesGrid = document.getElementById("notesGrid");
     dom.emptyState = document.getElementById("emptyState");
+    dom.emptyStateText = document.getElementById("emptyStateText");
     dom.noteTemplate = document.getElementById("noteCardTemplate");
 
     dom.composer = document.getElementById("composer");
     dom.composerForm = document.getElementById("composerForm");
-    dom.composerFormEl = dom.composerForm; // alias for clarity in color picker
+    dom.composerFormEl = dom.composerForm;
     dom.composerTitle = document.getElementById("composerTitle");
     dom.composerBody = document.getElementById("composerBody");
     dom.composerColors = document.getElementById("composerColors");
+    dom.composerColorBtn = document.getElementById("composerColorBtn");
+    dom.composerColorPopover = document.getElementById("composerColorPopover");
     dom.composerCloseBtn = document.getElementById("composerCloseBtn");
 
     dom.modalOverlay = document.getElementById("modalOverlay");
@@ -511,6 +581,8 @@
     dom.modalTitle = document.getElementById("modalTitle");
     dom.modalBody = document.getElementById("modalBody");
     dom.modalColors = document.getElementById("modalColors");
+    dom.modalColorBtn = document.getElementById("modalColorBtn");
+    dom.modalColorPopover = document.getElementById("modalColorPopover");
     dom.modalMeta = document.getElementById("modalMeta");
     dom.modalArchiveBtn = document.getElementById("modalArchiveBtn");
     dom.modalDeleteBtn = document.getElementById("modalDeleteBtn");
@@ -524,6 +596,8 @@
     dom.sidebar = document.getElementById("sidebar");
     dom.sidebarItems = document.querySelectorAll(".sidebar__item");
     dom.menuToggle = document.getElementById("menuToggle");
+    dom.refreshBtn = document.getElementById("refreshBtn");
+    dom.viewToggleBtn = document.getElementById("viewToggleBtn");
   }
 
   function init() {
@@ -533,6 +607,10 @@
     initModal();
     initSearch();
     initSidebar();
+    initMenuToggle();
+    initRefresh();
+    initViewToggle();
+    initPopoverDismiss();
     render();
   }
 

@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kazadi Google Keep</title>
-  <meta name="description" content="A corkboard-style note taking app: pin notes, tape them up, archive what's done." />
+  <title>Keep clone</title>
+  <meta name="description" content="A simplified Google Keep clone: create, archive, and search notes." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -16,32 +16,66 @@
 
   <!-- ===================== HEADER / TOP BAR ===================== -->
   <header class="topbar">
-    <div class="topbar__brand">
-      <span class="topbar__pin" aria-hidden="true">📌</span>
+    <div class="topbar__left">
+      <button class="icon-btn" id="menuToggle" data-tooltip="Main menu" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      </button>
+      <span class="topbar__logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6v.5h5.4v-.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z" fill="#f9ab00" stroke="#f9ab00" stroke-width="1"/></svg>
+      </span>
       <h1 class="topbar__title">Keep</h1>
     </div>
 
     <div class="topbar__search">
-      <label for="searchInput" class="visually-hidden">Search notes</label>
-      <input type="search" id="searchInput" placeholder="Search the board…" autocomplete="off" />
+      <svg viewBox="0 0 24 24" width="20" height="20" class="topbar__search-icon"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <label for="searchInput" class="visually-hidden">Search</label>
+      <input type="search" id="searchInput" placeholder="Search" autocomplete="off" />
     </div>
 
-    <button id="menuToggle" class="icon-btn topbar__menu-toggle" data-tooltip="Show menu" aria-label="Toggle sidebar">
-      <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
-    </button>
+    <div class="topbar__right">
+      <button class="icon-btn" id="refreshBtn" data-tooltip="Refresh" aria-label="Refresh notes">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M20 11A8 8 0 1 0 19 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M20 5v6h-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="icon-btn" id="viewToggleBtn" data-tooltip="List view" aria-label="Toggle list/grid view">
+        <svg viewBox="0 0 24 24" width="20" height="20" id="viewToggleIcon"><rect x="4" y="5" width="16" height="5" rx="1" stroke="currentColor" stroke-width="1.8" fill="none"/><rect x="4" y="14" width="16" height="5" rx="1" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
+      </button>
+      <button class="icon-btn" data-tooltip="Settings" aria-label="Settings (placeholder)">
+        <svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.7 7.7 0 0 0-1.7-1L14.8 3h-3.6l-.5 2.6a7.7 7.7 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.7 7.7 0 0 0 1.7 1l.5 2.6h3.6l.5-2.6a7.7 7.7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.6z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="icon-btn" data-tooltip="Google apps" aria-label="Apps (placeholder)">
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <circle cx="6" cy="6" r="1.6" fill="currentColor"/><circle cx="12" cy="6" r="1.6" fill="currentColor"/><circle cx="18" cy="6" r="1.6" fill="currentColor"/>
+          <circle cx="6" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18" cy="12" r="1.6" fill="currentColor"/>
+          <circle cx="6" cy="18" r="1.6" fill="currentColor"/><circle cx="12" cy="18" r="1.6" fill="currentColor"/><circle cx="18" cy="18" r="1.6" fill="currentColor"/>
+        </svg>
+      </button>
+      <span class="topbar__avatar" aria-label="Account" data-tooltip="Account">K</span>
+    </div>
   </header>
 
   <div class="layout">
 
     <!-- ===================== SIDEBAR ===================== -->
     <nav class="sidebar" id="sidebar" aria-label="Board sections">
-      <button class="sidebar__item is-active" data-view="notes">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 4h16v16H4z M4 9h16" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
-        <span>Notes</span>
+      <button class="sidebar__item is-active" data-view="notes" data-tooltip="Notes">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6v.5h5.4v-.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
+        <span class="sidebar__label">Notes</span>
       </button>
-      <button class="sidebar__item" data-view="archive">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 6h18v3H3zM5 9v11h14V9M10 13h4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
-        <span>Archive</span>
+      <button class="sidebar__item is-disabled" data-tooltip="Reminders (not in this demo)" aria-disabled="true">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 3a5 5 0 0 0-5 5v3l-2 4h14l-2-4V8a5 5 0 0 0-5-5zM10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
+        <span class="sidebar__label">Reminders</span>
+      </button>
+      <button class="sidebar__item is-disabled" data-tooltip="Edit labels (not in this demo)" aria-disabled="true">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M14 3l7 7-9 9H5v-7l9-9z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
+        <span class="sidebar__label">Edit labels</span>
+      </button>
+      <button class="sidebar__item" data-view="archive" data-tooltip="Archive">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 6h18v3H3zM5 9v11h14V9M10 13h4" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
+        <span class="sidebar__label">Archive</span>
+      </button>
+      <button class="sidebar__item is-disabled" data-tooltip="Trash (not in this demo)" aria-disabled="true">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="sidebar__label">Trash</span>
       </button>
     </nav>
 
@@ -50,7 +84,7 @@
 
       <!-- Composer: click to expand into a full note form -->
       <section class="composer" id="composer" aria-label="Create a new note">
-        <form id="composerForm" class="composer__form">
+        <form id="composerForm" class="composer__form" data-color="default">
           <input
             type="text"
             id="composerTitle"
@@ -66,19 +100,34 @@
           ></textarea>
 
           <div class="composer__toolbar">
-            <div class="composer__colors" id="composerColors" role="radiogroup" aria-label="Note color"></div>
-            <div class="composer__actions">
-              <button type="button" class="icon-btn" id="composerCloseBtn" data-tooltip="Close" aria-label="Close composer">
-                <svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <div class="composer__quick-actions">
+              <button type="button" class="icon-btn" data-tooltip="New list (not in this demo)" aria-label="New checklist">
+                <svg viewBox="0 0 24 24" width="19" height="19"><rect x="4" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M5.5 7l1 1 2-2" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 7h7M4 16h1.01M4 20h1.01M8 16h12M8 20h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
               </button>
-              <button type="submit" class="btn btn--primary" id="composerSaveBtn">Save</button>
+              <button type="button" class="icon-btn" id="composerColorBtn" data-tooltip="Background options" aria-label="Choose note color" aria-haspopup="true" aria-expanded="false">
+                <svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="icon-btn" data-tooltip="Add image (not in this demo)" aria-label="Add image">
+                <svg viewBox="0 0 24 24" width="19" height="19"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="8.5" cy="10" r="1.4" fill="currentColor"/><path d="M21 16l-5-5-9 9" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+              </button>
+
+              <!-- Color popover -->
+              <div class="color-popover" id="composerColorPopover" hidden>
+                <div class="composer__colors" id="composerColors" role="radiogroup" aria-label="Note color"></div>
+              </div>
+            </div>
+            <div class="composer__actions">
+              <button type="button" class="btn btn--text" id="composerCloseBtn">Close</button>
             </div>
           </div>
         </form>
       </section>
 
       <!-- Empty state -->
-      <p class="empty-state" id="emptyState" hidden></p>
+      <div class="empty-state" id="emptyState" hidden>
+        <svg viewBox="0 0 24 24" width="120" height="120" class="empty-state__icon"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6v.5h5.4v-.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z" stroke="currentColor" stroke-width="1" fill="none" stroke-linejoin="round"/></svg>
+        <p id="emptyStateText"></p>
+      </div>
 
       <!-- Notes grid -->
       <section class="notes-grid" id="notesGrid" aria-live="polite"></section>
@@ -88,7 +137,6 @@
   <!-- ===================== NOTE CARD TEMPLATE ===================== -->
   <template id="noteCardTemplate">
     <article class="note-card" tabindex="0">
-      <div class="note-card__tape" aria-hidden="true"></div>
       <h3 class="note-card__title"></h3>
       <p class="note-card__body"></p>
       <div class="note-card__footer">
@@ -111,13 +159,11 @@
   <!-- ===================== EDIT MODAL ===================== -->
   <div class="modal-overlay" id="modalOverlay" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitleLabel">
-      <div class="modal__tape" aria-hidden="true"></div>
       <input type="text" id="modalTitle" class="modal__title" placeholder="Title" aria-label="Note title" />
       <label id="modalTitleLabel" class="visually-hidden">Edit note</label>
       <textarea id="modalBody" class="modal__body" placeholder="Take a note…" aria-label="Note content"></textarea>
 
       <div class="modal__toolbar">
-        <div class="composer__colors" id="modalColors" role="radiogroup" aria-label="Note color"></div>
         <div class="modal__meta" id="modalMeta"></div>
       </div>
 
@@ -125,10 +171,16 @@
         <button class="icon-btn" id="modalArchiveBtn" data-tooltip="Archive" aria-label="Archive note">
           <svg viewBox="0 0 24 24" width="19" height="19"><path d="M3 6h18v3H3zM5 9v11h14V9M10 13h4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
         </button>
+        <button class="icon-btn" id="modalColorBtn" data-tooltip="Background options" aria-label="Choose note color" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        </button>
         <button class="icon-btn" id="modalDeleteBtn" data-tooltip="Delete forever" aria-label="Delete note">
           <svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
-        <button class="btn btn--primary" id="modalCloseBtn">Close</button>
+        <div class="color-popover color-popover--modal" id="modalColorPopover" hidden>
+          <div class="composer__colors" id="modalColors" role="radiogroup" aria-label="Note color"></div>
+        </div>
+        <button class="btn btn--text" id="modalCloseBtn" style="margin-left:auto;">Close</button>
       </div>
     </div>
   </div>
@@ -139,6 +191,6 @@
     <button class="toast__action" id="toastActionBtn"></button>
   </div>
 
-  <script src="script.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
