@@ -1,8 +1,9 @@
 # Google Keep clone
 
-A simplified Google Keep-style note app built with plain HTML, CSS, and
-JavaScript (no frameworks, no build step). Notes look like paper cards
-"taped" to a corkboard — that's the visual signature of this build.
+A simplified Google Keep clone built with plain HTML, CSS, and JavaScript
+(no frameworks, no build step), styled to closely match Google Keep's real
+UI: white chrome, the rounded search bar, an icon-only sidebar rail that
+expands into labels, and pastel note cards.
 
 ## Features
 
@@ -17,14 +18,22 @@ JavaScript (no frameworks, no build step). Notes look like paper cards
   action for a few seconds before it's gone for good.
 - **Search** — the search bar in the header filters visible notes by title
   and body in real time.
-- **Color picker** — six paper colors, available in both the composer and
-  the editor modal.
+- **Color picker** — nine paper colors in a popover (click the paintbrush
+  icon), available in both the composer and the editor modal.
+- **List/grid view toggle** — the icon next to refresh in the top bar
+  switches the note layout between masonry grid and single column.
+- **Sidebar expand** — the hamburger menu expands the icon-only rail into
+  labeled items on desktop, or opens a drawer on mobile.
 - **Tooltips** — every icon button has a hover/focus tooltip describing what
   it does.
 - **Responsive layout** — the sidebar collapses into a toggleable drawer on
   small screens; the note grid reflows into a single column on mobile.
 - **Persistence** — notes are saved to the browser's `localStorage`, so your
   board is still there after a refresh.
+
+Note: a few icons visible in real Google Keep (Reminders, Edit labels,
+Trash, Settings, Apps grid) are included for visual fidelity but are
+non-functional placeholders in this demo — their tooltips say so.
 
 ## Project structure
 
