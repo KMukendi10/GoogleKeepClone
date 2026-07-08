@@ -240,8 +240,7 @@ textarea, input { font-family: inherit; }
 }
 .sidebar__item.is-active svg { color: #684b00; }
 
-.sidebar__item.is-disabled { color: var(--text-faint); cursor: default; }
-.sidebar__item.is-disabled:hover { background: transparent; }
+.sidebar__item.is-disabled { color: var(--text-faint); cursor: pointer; }
 
 .sidebar__item svg { flex-shrink: 0; }
 
@@ -399,6 +398,16 @@ textarea, input { font-family: inherit; }
   color: var(--text-faint);
   margin-top: 100px;
 }
+
+.empty-state img {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 12px;
+}
+/* Our own `display: flex` above otherwise beats the browser's built-in
+   `[hidden] { display: none }` rule, so the icon never actually hides
+   once a note exists. This puts `hidden` back in charge. */
+.empty-state[hidden] { display: none; }
 .empty-state__icon { color: #dadce0; margin-bottom: 12px; }
 .empty-state p { font-size: 22px; margin: 0; }
 

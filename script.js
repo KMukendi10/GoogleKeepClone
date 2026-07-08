@@ -489,7 +489,17 @@
 
   function initSidebar() {
     dom.sidebarItems.forEach((item) => {
-      if (item.classList.contains("is-disabled")) return;
+      if (item.classList.contains("is-disabled")) {
+        // These sections (Reminders, Edit labels, Trash) aren't implemented
+        // in this demo, but the button should still respond to a click
+        // rather than sitting there dead.
+        item.addEventListener("click", () => {
+          const label = item.querySelector(".sidebar__label")?.textContent || "This section";
+          showToast(`${label} isn't available in this demo.`, null);
+          dom.sidebar.classList.remove("is-open");
+        });
+        return;
+      }
       item.addEventListener("click", () => {
         dom.sidebarItems.forEach((el) => el.classList.remove("is-active"));
         item.classList.add("is-active");
