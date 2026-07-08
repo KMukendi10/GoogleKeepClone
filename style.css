@@ -79,7 +79,7 @@ textarea, input { font-family: inherit; }
   gap: 24px;
   padding: 8px 16px;
   background: var(--bg);
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid var(--border-strong);
   position: sticky;
   top: 0;
   z-index: 20;
@@ -89,7 +89,6 @@ textarea, input { font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 20px;
-  flex-shrink: 0;
 }
 
 .topbar__title {
@@ -143,10 +142,8 @@ textarea, input { font-family: inherit; }
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #7baaf7;
+  background: url(./Assets/Profile) center/cover no-repeat;
   color: #fff;
-  font-size: 14px;
-  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
