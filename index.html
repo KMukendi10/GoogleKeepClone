@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Keep clone</title>
-  <meta name="description" content="A simplified Google Keep clone: create, archive, and search notes." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" />
+  <link rel="icon" href="./Assets/Logo.png" type="image/x-icon" />
 
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -18,39 +18,36 @@
   <header class="topbar">
     <div class="topbar__left">
       <button class="icon-btn" id="menuToggle" data-tooltip="Main menu" aria-label="Toggle sidebar">
-        <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        <img src="./Assets/menu.svg" alt="Menu">
       </button>
       <span class="topbar__logo" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="26" height="26"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6v.5h5.4v-.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z" fill="#f9ab00" stroke="#f9ab00" stroke-width="1"/></svg>
+        <img src="./Assets/Logo.png" alt="Logo">
       </span>
       <h1 class="topbar__title">Keep</h1>
     </div>
 
     <div class="topbar__search">
-      <svg viewBox="0 0 24 24" width="20" height="20" class="topbar__search-icon"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <img src="./Assets/search.svg" alt="Search">
       <label for="searchInput" class="visually-hidden">Search</label>
       <input type="search" id="searchInput" placeholder="Search" autocomplete="off" />
     </div>
 
     <div class="topbar__right">
       <button class="icon-btn" id="refreshBtn" data-tooltip="Refresh" aria-label="Refresh notes">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M20 11A8 8 0 1 0 19 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M20 5v6h-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <img src="./Assets/refresh.svg" alt="Refresh">
       </button>
       <button class="icon-btn" id="viewToggleBtn" data-tooltip="List view" aria-label="Toggle list/grid view">
-        <svg viewBox="0 0 24 24" width="20" height="20" id="viewToggleIcon"><rect x="4" y="5" width="16" height="5" rx="1" stroke="currentColor" stroke-width="1.8" fill="none"/><rect x="4" y="14" width="16" height="5" rx="1" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
+        <img src="./Assets/listView.svg" alt="List View">
       </button>
       <button class="icon-btn" data-tooltip="Settings" aria-label="Settings (placeholder)">
-        <svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.7 7.7 0 0 0-1.7-1L14.8 3h-3.6l-.5 2.6a7.7 7.7 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.7 7.7 0 0 0 1.7 1l.5 2.6h3.6l.5-2.6a7.7 7.7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.6z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/></svg>
+        <img src="./Assets/settings.svg" alt="Settings">
       </button>
       <button class="icon-btn" data-tooltip="Google apps" aria-label="Apps (placeholder)">
-        <svg viewBox="0 0 24 24" width="20" height="20">
-          <circle cx="6" cy="6" r="1.6" fill="currentColor"/><circle cx="12" cy="6" r="1.6" fill="currentColor"/><circle cx="18" cy="6" r="1.6" fill="currentColor"/>
-          <circle cx="6" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18" cy="12" r="1.6" fill="currentColor"/>
-          <circle cx="6" cy="18" r="1.6" fill="currentColor"/><circle cx="12" cy="18" r="1.6" fill="currentColor"/><circle cx="18" cy="18" r="1.6" fill="currentColor"/>
-        </svg>
+        <img src="./Assets/googleApps.svg" alt="">
       </button>
       <span class="topbar__avatar" aria-label="Account" data-tooltip="Account">K</span>
     </div>
+    
   </header>
 
   <div class="layout">
@@ -58,23 +55,23 @@
     <!-- ===================== SIDEBAR ===================== -->
     <nav class="sidebar" id="sidebar" aria-label="Board sections">
       <button class="sidebar__item is-active" data-view="notes" data-tooltip="Notes">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6v.5h5.4v-.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
+        <img src="./Assets/notes.svg" alt="Notes">
         <span class="sidebar__label">Notes</span>
       </button>
       <button class="sidebar__item is-disabled" data-tooltip="Reminders (not in this demo)" aria-disabled="true">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 3a5 5 0 0 0-5 5v3l-2 4h14l-2-4V8a5 5 0 0 0-5-5zM10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
+        <img src="./Assets/reminders.svg" alt="Reminders">
         <span class="sidebar__label">Reminders</span>
       </button>
       <button class="sidebar__item is-disabled" data-tooltip="Edit labels (not in this demo)" aria-disabled="true">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M14 3l7 7-9 9H5v-7l9-9z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
-        <span class="sidebar__label">Edit labels</span>
+        <img src="./Assets/edit.svg" alt="Edit labels">
+        <span class="sidebar__label">Edit</span>
       </button>
       <button class="sidebar__item" data-view="archive" data-tooltip="Archive">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 6h18v3H3zM5 9v11h14V9M10 13h4" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
+        <img src="./Assets/archive.svg" alt="">
         <span class="sidebar__label">Archive</span>
       </button>
       <button class="sidebar__item is-disabled" data-tooltip="Trash (not in this demo)" aria-disabled="true">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <img src="./Assets/delete.svg" alt="Trash">
         <span class="sidebar__label">Trash</span>
       </button>
     </nav>
