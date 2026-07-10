@@ -459,6 +459,12 @@ textarea, input { font-family: inherit; }
 .empty-state__icon { color: #dadce0; margin-bottom: 12px; }
 .empty-state p { font-size: 22px; margin: 0; }
 
+.empty-state img {
+  width: 250px;
+  height: 250px;
+  margin-bottom: 12px;
+}
+
 .note-card {
   break-inside: avoid;
   margin-bottom: 16px;
