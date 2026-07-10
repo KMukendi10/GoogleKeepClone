@@ -1,7 +1,7 @@
 /**
- * KEEP CLONE — styled after Google Keep
+ * Kazadi KEEP CLONE interactivity
  * ------------------------------------------------------------------
- * Organized into clear sections:
+ * Organized into sections:
  *   1. Constants & state
  *   2. Persistence (localStorage)
  *   3. Rendering (notes grid, note cards)
@@ -112,9 +112,9 @@
     return [
       {
         id: crypto.randomUUID(),
-        title: "Welcome",
-        body: "Click \"Take a note…\" to jot something down. Hover a note to archive or delete it, or click it to open the full editor.",
-        color: "sand",
+        title: "Welcome Message",
+        body: "Welcome to Kazadi Google Keep clone! This is a sample note to get you started.",
+        color: "mint",
         archived: false,
         pinned: false,
         trashed: false,
@@ -122,33 +122,7 @@
         hasReminder: false,
         createdAt: now,
         updatedAt: now,
-      },
-      {
-        id: crypto.randomUUID(),
-        title: "Grocery list",
-        body: "Eggs\nOat milk\nCoffee\nBasil",
-        color: "mint",
-        archived: false,
-        pinned: false,
-        trashed: false,
-        deletedAt: null,
-        hasReminder: false,
-        createdAt: now - 1000 * 60 * 60,
-        updatedAt: now - 1000 * 60 * 60,
-      },
-      {
-        id: crypto.randomUUID(),
-        title: "Idea",
-        body: "Notes get archived instead of deleted when you're done with them, so nothing important disappears by accident.",
-        color: "storm",
-        archived: true,
-        pinned: false,
-        trashed: false,
-        deletedAt: null,
-        hasReminder: false,
-        createdAt: now - 1000 * 60 * 60 * 24,
-        updatedAt: now - 1000 * 60 * 60 * 24,
-      },
+      }
     ];
   }
 
@@ -241,7 +215,7 @@
         : currentView === "trash"
         ? "No notes in Trash."
         : currentView === "reminders"
-        ? "No reminders yet. Set one from a note's toolbar."
+        ? "No reminders yet."
         : "Notes you add appear here";
     } else {
       dom.emptyState.hidden = true;
@@ -749,7 +723,7 @@
       deleteBtn.setAttribute("data-tooltip", "Delete label");
       deleteBtn.setAttribute("aria-label", `Delete label ${label}`);
       deleteBtn.innerHTML =
-        '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+        '<img src="./Assets/delete.svg" alt="Delete">';
       deleteBtn.addEventListener("click", () => {
         labels.splice(index, 1);
         saveLabels();
