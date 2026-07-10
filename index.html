@@ -14,7 +14,6 @@
 </head>
 <body>
 
-  <!-- ===================== HEADER / TOP BAR ===================== -->
   <header class="topbar">
     <div class="topbar__left">
       <button class="icon-btn" id="menuToggle" data-tooltip="Main menu" aria-label="Toggle sidebar">
@@ -26,13 +25,19 @@
       <h1 class="topbar__title">Keep</h1>
     </div>
 
-    <div class="topbar__search">
-      <img src="./Assets/search.svg" alt="Search">
+    <div class="topbar__search" id="topbarSearch">
+      <button type="button" class="icon-btn search-back-btn" id="searchBackBtn" aria-label="Exit search">
+        <span style="font-size: 20px;">←</span> 
+      </button>
+      <img src="./Assets/search.svg" alt="Search" class="search-lens-icon">
       <label for="searchInput" class="visually-hidden">Search</label>
       <input type="search" id="searchInput" placeholder="Search" autocomplete="off" />
     </div>
 
     <div class="topbar__right">
+      <button type="button" class="icon-btn mobile-search-btn" id="mobileSearchBtn" data-tooltip="Search" aria-label="Search">
+        <img src="./Assets/search.svg" alt="Search">
+      </button>
       <button class="icon-btn" id="refreshBtn" data-tooltip="Refresh" aria-label="Refresh notes">
         <img src="./Assets/refresh.svg" alt="Refresh">
       </button>
@@ -47,12 +52,9 @@
       </button>
       <span class="topbar__avatar" aria-label="Account" data-tooltip="Account"></span>
     </div>
-
   </header>
 
   <div class="layout">
-
-    <!-- ===================== SIDEBAR ===================== -->
     <nav class="sidebar" id="sidebar" aria-label="Board sections">
       <button class="sidebar__item is-active" data-view="notes" data-tooltip="Notes">
         <img src="./Assets/notes.svg" alt="Notes">
@@ -76,34 +78,15 @@
       </button>
     </nav>
 
-    <!-- ===================== MAIN BOARD ===================== -->
     <main class="board" id="board">
-
-      <!-- Composer: click to expand into a full note form -->
       <section class="composer" id="composer" aria-label="Create a new note">
         <form id="composerForm" class="composer__form" data-color="default">
-
           <button type="button" class="icon-btn composer__pin-btn" id="composerPinBtn" data-tooltip="Pin note" aria-pressed="false" aria-label="Pin note">
             <img src="./Assets/pinNote.svg" alt="Pin note">
           </button>
-
-          <input
-            type="text"
-            id="composerTitle"
-            class="composer__title"
-            placeholder="Title"
-            autocomplete="off"
-          />
-
-          <!-- Collapsed & expanded both use this row: icons hide once expanded -->
+          <input type="text" id="composerTitle" class="composer__title" placeholder="Title" autocomplete="off" />
           <div class="composer__row">
-            <textarea
-              id="composerBody"
-              class="composer__body"
-              placeholder="Take a note…"
-              rows="1"
-            ></textarea>
-
+            <textarea id="composerBody" class="composer__body" placeholder="Take a note…" rows="1"></textarea>
             <div class="composer__quick-icons">
               <button type="button" class="icon-btn" id="composerListBtnCollapsed" data-tooltip="New list" aria-label="New checklist">
                 <img src="./Assets/newlist.svg" alt="New list">
@@ -116,8 +99,6 @@
               </button>
             </div>
           </div>
-
-          <!-- Expanded toolbar: full Keep-style icon row, only visible when open -->
           <div class="composer__toolbar">
             <div class="composer__quick-actions">
               <button type="button" class="icon-btn" data-tooltip="Text formatting" aria-label="Text formatting">
@@ -141,15 +122,12 @@
               <button type="button" class="icon-btn" data-tooltip="More options" aria-label="More options">
                 <img src="./Assets/more.svg" alt="More options">
               </button>
-
               <button type="button" class="icon-btn" id="composerUndoBtn" data-tooltip="Undo" aria-label="Undo" disabled>
                 <img src="./Assets/undo.svg" alt="Undo">
               </button>
               <button type="button" class="icon-btn" id="composerRedoBtn" data-tooltip="Redo" aria-label="Redo" disabled>
                 <img src="./Assets/undo.svg" alt="Redo" class="flip-vertical">
               </button>
-
-              <!-- Color popover -->
               <div class="color-popover" id="composerColorPopover" hidden>
                 <div class="composer__colors" id="composerColors" role="radiogroup" aria-label="Note color"></div>
               </div>
@@ -161,18 +139,15 @@
         </form>
       </section>
 
-      <!-- Empty state -->
       <div class="empty-state" id="emptyState" hidden>
         <svg viewBox="0 0 24 24" width="120" height="120" class="empty-state__icon"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6v.5h5.4v-.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z" stroke="currentColor" stroke-width="1" fill="none" stroke-linejoin="round"/></svg>
         <p id="emptyStateText"></p>
       </div>
 
-      <!-- Notes grid -->
       <section class="notes-grid" id="notesGrid" aria-live="polite"></section>
     </main>
   </div>
 
-  <!-- ===================== NOTE CARD TEMPLATE ===================== -->
   <template id="noteCardTemplate">
     <article class="note-card" tabindex="0">
       <h3 class="note-card__title"></h3>
@@ -194,67 +169,37 @@
     </article>
   </template>
 
-  <!-- ===================== EDIT MODAL ===================== -->
   <div class="modal-overlay" id="modalOverlay" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitleLabel">
       <input type="text" id="modalTitle" class="modal__title" placeholder="Title" aria-label="Note title" />
       <label id="modalTitleLabel" class="visually-hidden">Edit note</label>
       <textarea id="modalBody" class="modal__body" placeholder="Take a note…" aria-label="Note content"></textarea>
-
-      <div class="modal__toolbar">
-        <div class="modal__meta" id="modalMeta"></div>
-      </div>
-
+      <div class="modal__toolbar"><div class="modal__meta" id="modalMeta"></div></div>
       <div class="modal__footer">
-        <button class="icon-btn" id="modalArchiveBtn" data-tooltip="Archive" aria-label="Archive note">
-          <img src="./Assets/archive.svg" alt="Archive">
-        </button>
-        <button class="icon-btn" id="modalRestoreBtn" data-tooltip="Restore" aria-label="Restore note" hidden>
-          <img src="./Assets/restore.svg" alt="Restore">
-        </button>
-        <button class="icon-btn" id="modalReminderBtn" data-tooltip="Remind me" aria-label="Toggle reminder" aria-pressed="false">
-          <img src="./Assets/remindMe.svg" alt="Remind me">
-        </button>
-        <button class="icon-btn" id="modalColorBtn" data-tooltip="Background options" aria-label="Choose note color" aria-haspopup="true" aria-expanded="false">
-          <img src="./Assets/backgroundOptions.svg" alt="Background options">
-        </button>
-        <button class="icon-btn" id="modalDeleteBtn" data-tooltip="Delete" aria-label="Delete note">
-          <img src="./Assets/delete.svg" alt="Delete">
-        </button>
-        <div class="color-popover color-popover--modal" id="modalColorPopover" hidden>
-          <div class="composer__colors" id="modalColors" role="radiogroup" aria-label="Note color"></div>
-        </div>
+        <button class="icon-btn" id="modalArchiveBtn" data-tooltip="Archive" aria-label="Archive note"><img src="./Assets/archive.svg" alt="Archive"></button>
+        <button class="icon-btn" id="modalRestoreBtn" data-tooltip="Restore" aria-label="Restore note" hidden><img src="./Assets/restore.svg" alt="Restore"></button>
+        <button class="icon-btn" id="modalReminderBtn" data-tooltip="Remind me" aria-label="Toggle reminder" aria-pressed="false"><img src="./Assets/remindMe.svg" alt="Remind me"></button>
+        <button class="icon-btn" id="modalColorBtn" data-tooltip="Background options" aria-label="Choose note color" aria-haspopup="true" aria-expanded="false"><img src="./Assets/backgroundOptions.svg" alt="Background options"></button>
+        <button class="icon-btn" id="modalDeleteBtn" data-tooltip="Delete" aria-label="Delete note"><img src="./Assets/delete.svg" alt="Delete"></button>
+        <div class="color-popover color-popover--modal" id="modalColorPopover" hidden><div class="composer__colors" id="modalColors" role="radiogroup" aria-label="Note color"></div></div>
         <button class="btn btn--text" id="modalCloseBtn" style="margin-left:auto;">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- ===================== EDIT LABELS MODAL ===================== -->
   <div class="modal-overlay" id="labelsModalOverlay" hidden>
     <div class="modal labels-modal" role="dialog" aria-modal="true" aria-labelledby="labelsModalTitle">
       <h2 id="labelsModalTitle" class="labels-modal__title">Edit labels</h2>
-
       <form id="labelsForm" class="labels-modal__form">
-        <label for="newLabelInput" class="visually-hidden">Create new label</label>
         <input type="text" id="newLabelInput" placeholder="Create new label" autocomplete="off" maxlength="40" />
-        <button type="submit" class="icon-btn" data-tooltip="Add label" aria-label="Add label">
-          <img src="./Assets/label.svg" alt="Add label">
-        </button>
+        <button type="submit" class="icon-btn" data-tooltip="Add label" aria-label="Add label"><img src="./Assets/label.svg" alt="Add label"></button>
       </form>
-
       <ul class="labels-modal__list" id="labelsList" aria-label="Your labels"></ul>
-
-      <div class="modal__footer" style="border-top: none;">
-        <button class="btn btn--text" id="labelsModalDoneBtn" style="margin-left:auto;">Done</button>
-      </div>
+      <div class="modal__footer" style="border-top: none;"><button class="btn btn--text" id="labelsModalDoneBtn" style="margin-left:auto;">Done</button></div>
     </div>
   </div>
 
-  <!-- ===================== TOAST ACTION ===================== -->
-  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
-    <span id="toastMessage"></span>
-    <button class="toast__action" id="toastActionBtn"></button>
-  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastMessage"></span><button class="toast__action" id="toastActionBtn"></button></div>
 
   <script src="script.js"></script>
 </body>

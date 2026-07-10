@@ -685,29 +685,75 @@ textarea, input { font-family: inherit; }
 .note-card[data-color="clay"], .composer__form[data-color="clay"], .modal[data-color="clay"] { background: var(--paper-clay); border-color: transparent; }
 
 /* ==========================================================================
-   Responsiveness
+   Responsiveness & Mobile Layout Engine
    ========================================================================== */
+
+.mobile-search-btn,
+.search-back-btn {
+  display: none;
+}
+
 @media (max-width: 900px) {
+  .topbar { gap: 16px; }
+  .topbar__title { display: none; }
+  .topbar__search { max-width: 100%; }
   .sidebar {
-    position: fixed;
-    left: -280px;
-    top: 58px;
-    height: calc(100vh - 58px);
-    background: var(--bg);
-    z-index: 15;
-    width: 280px;
+    position: fixed; left: -280px; top: 58px;
+    height: calc(100vh - 58px); background: var(--bg);
+    z-index: 15; width: 280px;
     box-shadow: 4px 0 16px rgba(0,0,0,0.15);
   }
   .sidebar.is-open { left: 0; }
   .sidebar .sidebar__label { opacity: 1; }
   .board { padding: 20px 16px 80px; }
-  .topbar__title { display: none; }
 }
 
 @media (max-width: 560px) {
-  .topbar { gap: 12px; padding: 8px 8px; }
-  .topbar__right .icon-btn:nth-child(2),
-  .topbar__right .icon-btn:nth-child(3) { display: none; }
+  .topbar { 
+    gap: 4px; 
+    padding: 8px;
+    justify-content: space-between;
+  }
+
+  /* Completely hide standard inline layout container */
+  .topbar__search {
+    display: none !important;
+  }
+
+  /* Reveal search entry icon button */
+  .mobile-search-btn {
+    display: inline-flex;
+  }
+
+  .topbar__right {
+    margin-left: unset;
+  }
+
+  /* Strip desktop utilities to save grid footprint */
+  .topbar__right .icon-btn:nth-child(4),
+  .topbar__right .icon-btn:nth-child(5) { 
+    display: none !important; 
+  }
+
+  /* DYNAMIC OVERLAY RULE: Activates via JS toggle */
+  .topbar.search-is-active .topbar__search {
+    display: flex !important;
+    position: absolute;
+    inset: 8px 16px;
+    max-width: none;
+    z-index: 30;
+    background: var(--search-bg-focus);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .topbar.search-is-active .search-back-btn {
+    display: inline-flex;
+  }
+
+  .topbar.search-is-active .search-lens-icon {
+    display: none;
+  }
+
   .notes-grid { column-width: 100%; }
   .modal { padding: 16px 14px 8px; }
 }

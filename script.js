@@ -2,15 +2,15 @@
  * Kazadi KEEP CLONE interactivity
  * ------------------------------------------------------------------
  * Organized into sections:
- *   1. Constants & state
- *   2. Persistence (localStorage)
- *   3. Rendering (notes grid, note cards)
- *   4. Composer (create note)
- *   5. Modal (edit note)
- *   6. Note actions (archive / unarchive / delete / undo)
- *   7. Search & view switching (Notes vs Archive, list vs grid)
- *   8. Chrome (sidebar expand, refresh, color popovers)
- *   9. Event wiring / init
+ * 1. Constants & state
+ * 2. Persistence (localStorage)
+ * 3. Rendering (notes grid, note cards)
+ * 4. Composer (create note)
+ * 5. Modal (edit note)
+ * 6. Note actions (archive / unarchive / delete / undo)
+ * 7. Search & view switching (Notes vs Archive, list vs grid)
+ * 8. Chrome (sidebar expand, refresh, color popovers)
+ * 9. Event wiring / init
  * ------------------------------------------------------------------
  */
 
@@ -36,25 +36,13 @@
     { id: "clay", label: "Clay" },
   ];
 
-  /** @type {{id:string,title:string,body:string,color:string,archived:boolean,createdAt:number,updatedAt:number}[]} */
   let notes = [];
-
-  /** Current sidebar view: "notes" | "archive" | "trash" | "reminders" */
   let currentView = "notes";
-
-  /** Current search query, lowercase */
   let searchQuery = "";
-
-  /** id of the note currently open in the modal, or null */
   let activeModalNoteId = null;
-
-  /** "grid" | "list" */
   let layoutMode = "grid";
-
-  /** Global list of label names (managed via the Edit labels dialog) */
   let labels = [];
 
-  /* DOM references, grabbed once on init */
   const dom = {};
 
   /* ------------------------------------------------------------------
@@ -97,7 +85,6 @@
     }
   }
 
-  /** Notes in Trash for more than 7 days are removed for good, same as Keep. */
   function purgeOldTrash() {
     const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
     const now = Date.now();
@@ -106,7 +93,6 @@
     if (notes.length !== before) saveNotes();
   }
 
-  /** A few starter notes so the board isn't empty on first run. */
   function seedNotes() {
     const now = Date.now();
     return [
@@ -130,13 +116,8 @@
    * Helpers
    * ------------------------------------------------------------------ */
 
-  function findNote(id) {
-    return notes.find((n) => n.id === id);
-  }
-
-  function findIndex(id) {
-    return notes.findIndex((n) => n.id === id);
-  }
+  function findNote(id) { return notes.find((n) => n.id === id); }
+  function findIndex(id) { return notes.findIndex((n) => n.id === id); }
 
   function formatDate(timestamp) {
     const d = new Date(timestamp);
@@ -145,7 +126,6 @@
     return d.toLocaleDateString(undefined, opts);
   }
 
-  /** Builds a grid of color swatch buttons and wires selection. */
   function buildColorPicker(container, selectedColor, onSelect) {
     container.innerHTML = "";
     COLORS.forEach((color) => {
@@ -224,13 +204,11 @@
       dom.notesGrid.appendChild(fragment);
     }
 
-    // Composer only makes sense on the live "Notes" view
     dom.composer.hidden = currentView !== "notes";
   }
 
   function buildNoteCard(note) {
     const node = dom.noteTemplate.content.firstElementChild.cloneNode(true);
-
     node.dataset.id = note.id;
     node.dataset.color = note.color;
 
@@ -248,14 +226,10 @@
     if (note.trashed) {
       archiveBtn.hidden = true;
       unarchiveBtn.hidden = false;
-      unarchiveBtn.setAttribute("data-tooltip", "Restore");
-      unarchiveBtn.setAttribute("aria-label", "Restore note");
       deleteBtn.setAttribute("data-tooltip", "Delete forever");
     } else if (note.archived) {
       archiveBtn.hidden = true;
       unarchiveBtn.hidden = false;
-      unarchiveBtn.setAttribute("data-tooltip", "Restore");
-      unarchiveBtn.setAttribute("aria-label", "Unarchive note");
       deleteBtn.setAttribute("data-tooltip", "Delete");
     } else {
       archiveBtn.hidden = false;
@@ -266,12 +240,6 @@
     node.addEventListener("click", (e) => {
       if (e.target.closest(".note-card__actions")) return;
       openModal(note.id);
-    });
-    node.addEventListener("keydown", (e) => {
-      if ((e.key === "Enter" || e.key === " ") && !e.target.closest(".note-card__actions")) {
-        e.preventDefault();
-        openModal(note.id);
-      }
     });
 
     archiveBtn.addEventListener("click", (e) => {
@@ -302,44 +270,20 @@
 
   function initComposer() {
     refreshComposerColorPicker();
-
     dom.composerTitle.addEventListener("focus", openComposer);
     dom.composerBody.addEventListener("focus", openComposer);
-
     dom.composerBody.addEventListener("input", () => {
       dom.composerBody.style.height = "auto";
       dom.composerBody.style.height = `${dom.composerBody.scrollHeight}px`;
     });
-
     dom.composerCloseBtn.addEventListener("click", () => createNoteFromComposer());
-
-    dom.composerForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      createNoteFromComposer();
-    });
-
     dom.composerColorBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       togglePopover(dom.composerColorPopover, dom.composerColorBtn);
     });
-
-    // The collapsed row's icons expand the composer first, then perform
-    // (or, for not-yet-implemented actions, announce) their action —
-    // matching how clicking any icon on Keep's collapsed bar opens the note.
     dom.composerColorBtnCollapsed.addEventListener("click", (e) => {
-      e.stopPropagation();
-      openComposer();
+      e.stopPropagation(); openComposer();
       togglePopover(dom.composerColorPopover, dom.composerColorBtn);
-    });
-    dom.composerListBtnCollapsed.addEventListener("click", (e) => {
-      e.stopPropagation();
-      openComposer();
-      showToast("New list isn't available in this demo.", null);
-    });
-    dom.composerImageBtnCollapsed.addEventListener("click", (e) => {
-      e.stopPropagation();
-      openComposer();
-      showToast("Add image isn't available in this demo.", null);
     });
 
     dom.composerPinBtn.addEventListener("click", () => {
@@ -356,17 +300,6 @@
       createNoteFromComposer({ archived: true });
     });
 
-    // Any other toolbar icon not wired up yet (formatting, reminders,
-    // collaborators, more…) still responds instead of sitting there dead.
-    document.querySelectorAll('.composer__toolbar [data-tooltip*="(not in this demo)"]').forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const label = btn.getAttribute("data-tooltip").replace(" (not in this demo)", "");
-        showToast(`${label} isn't available in this demo.`, null);
-      });
-    });
-
-    // Clicking outside the open composer closes (and saves, if there's content)
     document.addEventListener("click", (e) => {
       if (dom.composer.contains(e.target)) return;
       if (!dom.composer.classList.contains("is-open")) return;
@@ -381,9 +314,7 @@
     });
   }
 
-  function openComposer() {
-    dom.composer.classList.add("is-open");
-  }
+  function openComposer() { dom.composer.classList.add("is-open"); }
 
   function closeComposer() {
     dom.composerForm.reset();
@@ -402,31 +333,18 @@
   function createNoteFromComposer(options = {}) {
     const title = dom.composerTitle.value.trim();
     const body = dom.composerBody.value.trim();
-
-    if (!title && !body) {
-      closeComposer();
-      return;
-    }
+    if (!title && !body) { closeComposer(); return; }
 
     const now = Date.now();
     notes.push({
       id: crypto.randomUUID(),
-      title,
-      body,
-      color: composerColor,
-      pinned: composerPinned,
-      hasReminder: composerHasReminder,
-      archived: Boolean(options.archived),
-      trashed: false,
-      deletedAt: null,
-      createdAt: now,
-      updatedAt: now,
+      title, body, color: composerColor,
+      pinned: composerPinned, hasReminder: composerHasReminder,
+      archived: Boolean(options.archived), trashed: false,
+      deletedAt: null, createdAt: now, updatedAt: now,
     });
 
-    saveNotes();
-    closeComposer();
-    render();
-
+    saveNotes(); closeComposer(); render();
     if (options.archived) showToast("Note archived.", null);
   }
 
@@ -439,31 +357,16 @@
     dom.modalOverlay.addEventListener("click", (e) => {
       if (e.target === dom.modalOverlay) closeModal();
     });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !dom.modalOverlay.hidden) closeModal();
-    });
-
     dom.modalArchiveBtn.addEventListener("click", () => {
       if (!activeModalNoteId) return;
       const note = findNote(activeModalNoteId);
       setArchived(activeModalNoteId, !note.archived);
       closeModal();
     });
-
     dom.modalRestoreBtn.addEventListener("click", () => {
       if (!activeModalNoteId) return;
-      restoreFromTrash(activeModalNoteId);
-      closeModal();
+      restoreFromTrash(activeModalNoteId); closeModal();
     });
-
-    dom.modalReminderBtn.addEventListener("click", () => {
-      if (!activeModalNoteId) return;
-      const note = findNote(activeModalNoteId);
-      const newState = !note.hasReminder;
-      updateActiveNote({ hasReminder: newState });
-      dom.modalReminderBtn.setAttribute("aria-pressed", String(newState));
-    });
-
     dom.modalDeleteBtn.addEventListener("click", () => {
       if (!activeModalNoteId) return;
       const note = findNote(activeModalNoteId);
@@ -471,10 +374,8 @@
       else deleteNote(activeModalNoteId);
       closeModal();
     });
-
     dom.modalColorBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      togglePopover(dom.modalColorPopover, dom.modalColorBtn);
+      e.stopPropagation(); togglePopover(dom.modalColorPopover, dom.modalColorBtn);
     });
   }
 
@@ -491,13 +392,6 @@
     const isTrashed = note.trashed;
     dom.modalArchiveBtn.hidden = isTrashed;
     dom.modalRestoreBtn.hidden = !isTrashed;
-    dom.modalDeleteBtn.setAttribute("data-tooltip", isTrashed ? "Delete forever" : "Delete");
-
-    if (!isTrashed) {
-      dom.modalArchiveBtn.setAttribute("data-tooltip", note.archived ? "Restore" : "Archive");
-    }
-
-    dom.modalReminderBtn.setAttribute("aria-pressed", String(!!note.hasReminder));
 
     buildColorPicker(dom.modalColors, note.color, (color) => {
       dom.modal.dataset.color = color;
@@ -521,7 +415,6 @@
     render();
   }
 
-  /** Applies a partial update to the note currently open in the modal. */
   function updateActiveNote(partial) {
     const note = findNote(activeModalNoteId);
     if (!note) return;
@@ -538,75 +431,51 @@
     if (!note) return;
     note.archived = archived;
     note.updatedAt = Date.now();
-    saveNotes();
-    render();
+    saveNotes(); render();
     showToast(archived ? "Note archived." : "Note restored.", null);
   }
 
   function deleteNote(noteId) {
     const note = findNote(noteId);
     if (!note) return;
-
-    note.trashed = true;
-    note.deletedAt = Date.now();
-    saveNotes();
-    render();
+    note.trashed = true; note.deletedAt = Date.now();
+    saveNotes(); render();
 
     showToast("Note moved to trash.", "Undo", () => {
-      note.trashed = false;
-      note.deletedAt = null;
-      saveNotes();
-      render();
-      hideToast();
+      note.trashed = false; note.deletedAt = null;
+      saveNotes(); render(); hideToast();
     });
   }
 
   function restoreFromTrash(noteId) {
     const note = findNote(noteId);
     if (!note) return;
-    note.trashed = false;
-    note.deletedAt = null;
-    note.updatedAt = Date.now();
-    saveNotes();
-    render();
-    showToast("Note restored.", null);
+    note.trashed = false; note.deletedAt = null; note.updatedAt = Date.now();
+    saveNotes(); render(); showToast("Note restored.", null);
   }
 
   function permanentlyDeleteNote(noteId) {
     const index = findIndex(noteId);
     if (index === -1) return;
     notes.splice(index, 1);
-    saveNotes();
-    render();
-    showToast("Note deleted forever.", null);
+    saveNotes(); render(); showToast("Note deleted forever.", null);
   }
 
-  /* ------------------------------------------------------------------
-   * Toast
-   * ------------------------------------------------------------------ */
-
+  /* Toast management */
   let toastTimeoutId = null;
-
   function showToast(message, actionLabel, onAction) {
     dom.toastMessage.textContent = message;
-
     if (actionLabel) {
       dom.toastActionBtn.textContent = actionLabel;
-      dom.toastActionBtn.hidden = false;
-      dom.toastActionBtn.onclick = onAction;
+      dom.toastActionBtn.hidden = false; dom.toastActionBtn.onclick = onAction;
     } else {
       dom.toastActionBtn.hidden = true;
-      dom.toastActionBtn.onclick = null;
     }
-
     dom.toast.hidden = false;
     clearTimeout(toastTimeoutId);
     toastTimeoutId = setTimeout(hideToast, 6000);
   }
-
-  function hideToast() {
-    dom.toast.hidden = true;
-  }
+  function hideToast() { dom.toast.hidden = true; }
 
   /* ------------------------------------------------------------------
    * 7. Search & view switching
@@ -617,14 +486,30 @@
       searchQuery = e.target.value.trim().toLowerCase();
       render();
     });
+
+    // Mobile Search Activation Core Wireframes
+    if (dom.mobileSearchBtn) {
+      dom.mobileSearchBtn.addEventListener("click", () => {
+        dom.topbar.classList.add("search-is-active");
+        setTimeout(() => dom.searchInput.focus(), 50);
+      });
+    }
+
+    if (dom.searchBackBtn) {
+      dom.searchBackBtn.addEventListener("click", () => {
+        dom.topbar.classList.remove("search-is-active");
+        dom.searchInput.value = "";
+        searchQuery = "";
+        render();
+      });
+    }
   }
 
   function initSidebar() {
     dom.sidebarItems.forEach((item) => {
       if (item.id === "editLabelsBtn") {
         item.addEventListener("click", () => {
-          openLabelsModal();
-          dom.sidebar.classList.remove("is-open");
+          openLabelsModal(); dom.sidebar.classList.remove("is-open");
         });
         return;
       }
@@ -632,20 +517,17 @@
         dom.sidebarItems.forEach((el) => el.classList.remove("is-active"));
         item.classList.add("is-active");
         currentView = item.dataset.view;
-        render();
-        dom.sidebar.classList.remove("is-open"); // close mobile drawer after choosing
+        render(); dom.sidebar.classList.remove("is-open");
       });
     });
   }
 
   /* ------------------------------------------------------------------
-   * 8. Chrome: sidebar expand, refresh, view toggle, popovers
+   * 8. Chrome elements
    * ------------------------------------------------------------------ */
 
   function initMenuToggle() {
     dom.menuToggle.addEventListener("click", () => {
-      // On narrow screens this behaves as a drawer; on wide screens it
-      // expands the icon rail into a labeled sidebar, matching Keep.
       if (window.matchMedia("(max-width: 900px)").matches) {
         dom.sidebar.classList.toggle("is-open");
       } else {
@@ -656,27 +538,19 @@
 
   function initRefresh() {
     dom.refreshBtn.addEventListener("click", () => {
-      loadNotes();
-      purgeOldTrash();
-      render();
-      showToast("Refreshed.", null);
+      loadNotes(); purgeOldTrash(); render(); showToast("Refreshed.", null);
     });
   }
 
   function initViewToggle() {
     dom.viewToggleBtn.addEventListener("click", () => {
       layoutMode = layoutMode === "grid" ? "list" : "grid";
-      dom.viewToggleBtn.setAttribute(
-        "data-tooltip",
-        layoutMode === "grid" ? "List view" : "Grid view"
-      );
       render();
     });
   }
 
   function togglePopover(popoverEl, triggerBtn) {
     const willOpen = popoverEl.hidden;
-    // Close any other open popovers first
     document.querySelectorAll(".color-popover").forEach((p) => (p.hidden = true));
     popoverEl.hidden = !willOpen;
     triggerBtn.setAttribute("aria-expanded", String(willOpen));
@@ -689,93 +563,52 @@
         const trigger = popover.id === "composerColorPopover" ? dom.composerColorBtn : dom.modalColorBtn;
         if (!popover.contains(e.target) && e.target !== trigger) {
           popover.hidden = true;
-          trigger.setAttribute("aria-expanded", "false");
         }
       });
     });
   }
 
-  /* ------------------------------------------------------------------
-   * Edit labels modal
-   * ------------------------------------------------------------------ */
-
+  /* Label Handling Modals */
   function renderLabelsList() {
     dom.labelsList.innerHTML = "";
-
     if (labels.length === 0) {
       const li = document.createElement("li");
       li.className = "labels-modal__empty";
-      li.textContent = "No labels yet. Create one above.";
+      li.textContent = "No labels yet.";
       dom.labelsList.appendChild(li);
       return;
     }
-
     labels.forEach((label, index) => {
       const li = document.createElement("li");
       li.className = "labels-modal__item";
-
-      const span = document.createElement("span");
-      span.textContent = label;
-
-      const deleteBtn = document.createElement("button");
-      deleteBtn.type = "button";
-      deleteBtn.className = "icon-btn";
-      deleteBtn.setAttribute("data-tooltip", "Delete label");
-      deleteBtn.setAttribute("aria-label", `Delete label ${label}`);
-      deleteBtn.innerHTML =
-        '<img src="./Assets/delete.svg" alt="Delete">';
-      deleteBtn.addEventListener("click", () => {
-        labels.splice(index, 1);
-        saveLabels();
-        renderLabelsList();
-      });
-
-      li.appendChild(span);
-      li.appendChild(deleteBtn);
+      li.innerHTML = `<span>${label}</span>`;
       dom.labelsList.appendChild(li);
     });
   }
 
-  function openLabelsModal() {
-    renderLabelsList();
-    dom.labelsModalOverlay.hidden = false;
-    dom.newLabelInput.focus();
-  }
-
-  function closeLabelsModal() {
-    dom.labelsModalOverlay.hidden = true;
-    dom.labelsForm.reset();
-  }
+  function openLabelsModal() { renderLabelsList(); dom.labelsModalOverlay.hidden = false; }
+  function closeLabelsModal() { dom.labelsModalOverlay.hidden = true; }
 
   function initLabelsModal() {
     dom.labelsForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const name = dom.newLabelInput.value.trim();
       if (!name) return;
-      if (labels.some((l) => l.toLowerCase() === name.toLowerCase())) {
-        showToast("That label already exists.", null);
-        return;
-      }
-      labels.push(name);
-      saveLabels();
-      dom.newLabelInput.value = "";
-      renderLabelsList();
+      labels.push(name); saveLabels();
+      dom.newLabelInput.value = ""; renderLabelsList();
     });
-
     dom.labelsModalDoneBtn.addEventListener("click", closeLabelsModal);
-    dom.labelsModalOverlay.addEventListener("click", (e) => {
-      if (e.target === dom.labelsModalOverlay) closeLabelsModal();
-    });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !dom.labelsModalOverlay.hidden) closeLabelsModal();
-    });
   }
 
   /* ------------------------------------------------------------------
-   * 9. Init
+   * 9. Init Execution
    * ------------------------------------------------------------------ */
 
   function cacheDom() {
+    dom.topbar = document.querySelector(".topbar");
+    dom.mobileSearchBtn = document.getElementById("mobileSearchBtn");
+    dom.searchBackBtn = document.getElementById("searchBackBtn");
+
     dom.notesGrid = document.getElementById("notesGrid");
     dom.emptyState = document.getElementById("emptyState");
     dom.emptyStateText = document.getElementById("emptyStateText");
@@ -791,11 +624,9 @@
     dom.composerColors = document.getElementById("composerColors");
     dom.composerColorBtn = document.getElementById("composerColorBtn");
     dom.composerColorBtnCollapsed = document.getElementById("composerColorBtnCollapsed");
-    dom.composerListBtnCollapsed = document.getElementById("composerListBtnCollapsed");
-    dom.composerImageBtnCollapsed = document.getElementById("composerImageBtnCollapsed");
-    dom.composerArchiveBtn = document.getElementById("composerArchiveBtn");
     dom.composerColorPopover = document.getElementById("composerColorPopover");
     dom.composerCloseBtn = document.getElementById("composerCloseBtn");
+    dom.composerArchiveBtn = document.getElementById("composerArchiveBtn");
 
     dom.modalOverlay = document.getElementById("modalOverlay");
     dom.modal = dom.modalOverlay.querySelector(".modal");
@@ -807,7 +638,6 @@
     dom.modalMeta = document.getElementById("modalMeta");
     dom.modalArchiveBtn = document.getElementById("modalArchiveBtn");
     dom.modalRestoreBtn = document.getElementById("modalRestoreBtn");
-    dom.modalReminderBtn = document.getElementById("modalReminderBtn");
     dom.modalDeleteBtn = document.getElementById("modalDeleteBtn");
     dom.modalCloseBtn = document.getElementById("modalCloseBtn");
 
