@@ -84,7 +84,7 @@
         <form id="composerForm" class="composer__form" data-color="default">
 
           <button type="button" class="icon-btn composer__pin-btn" id="composerPinBtn" data-tooltip="Pin note" aria-pressed="false" aria-label="Pin note">
-            <svg viewBox="0 0 24 24" width="19" height="19"><path d="M12 2l1.5 5.5L19 9l-4 3.5 1 5.5-4-2.8L8 18l1-5.5L5 9l5.5-1.5z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/></svg>
+            <img src="./Assets/pinNote.svg" alt="Pin note">
           </button>
 
           <input
@@ -105,14 +105,14 @@
             ></textarea>
 
             <div class="composer__quick-icons">
-              <button type="button" class="icon-btn" id="composerListBtnCollapsed" data-tooltip="New list (not in this demo)" aria-label="New checklist">
-                <svg viewBox="0 0 24 24" width="19" height="19"><rect x="4" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M5.5 7l1 1 2-2" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 7h7M4 16h1.01M4 20h1.01M8 16h12M8 20h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <button type="button" class="icon-btn" id="composerListBtnCollapsed" data-tooltip="New list" aria-label="New checklist">
+                <img src="./Assets/newlist.svg" alt="New list">
               </button>
-              <button type="button" class="icon-btn" id="composerColorBtnCollapsed" data-tooltip="Background options" aria-label="Choose note color">
-                <svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+              <button type="button" class="icon-btn" id="composerColorBtnCollapsed" data-tooltip="New note with drawing" aria-label="Note with a drawing">
+                <img src="./Assets/newnotedrawing.svg" alt="New Note With Drawing">
               </button>
-              <button type="button" class="icon-btn" id="composerImageBtnCollapsed" data-tooltip="Add image (not in this demo)" aria-label="Add image">
-                <svg viewBox="0 0 24 24" width="19" height="19"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="8.5" cy="10" r="1.4" fill="currentColor"/><path d="M21 16l-5-5-9 9" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+              <button type="button" class="icon-btn" id="composerImageBtnCollapsed" data-tooltip="New note with image" aria-label="Note with image">
+                <img src="./Assets/newnoteimage.svg" alt="New Note With Image">
               </button>
             </div>
           </div>
@@ -120,33 +120,33 @@
           <!-- Expanded toolbar: full Keep-style icon row, only visible when open -->
           <div class="composer__toolbar">
             <div class="composer__quick-actions">
-              <button type="button" class="icon-btn" data-tooltip="Text formatting (not in this demo)" aria-label="Text formatting">
-                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 19L11 5h2l5 14M8 13h8" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <button type="button" class="icon-btn" data-tooltip="Text formatting" aria-label="Text formatting">
+                <img src="./Assets/formatting.svg" alt="Text formatting">
               </button>
               <button type="button" class="icon-btn" id="composerColorBtn" data-tooltip="Background options" aria-label="Choose note color" aria-haspopup="true" aria-expanded="false">
-                <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M12 3a4 4 0 100 8 2 2 0 010 4 6 6 0 000 8" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
+                <img src="./Assets/backgroundOptions.svg" alt="Background options">
               </button>
               <button type="button" class="icon-btn" id="composerReminderBtn" data-tooltip="Remind me" aria-label="Toggle reminder" aria-pressed="false">
-                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 3a5 5 0 0 0-5 5v3l-2 4h14l-2-4V8a5 5 0 0 0-5-5zM10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+                <img src="./Assets/remindMe.svg" alt="Remind me">
               </button>
-              <button type="button" class="icon-btn" data-tooltip="Collaborator (not in this demo)" aria-label="Add collaborator">
-                <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M18 8v6M15 11h6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+              <button type="button" class="icon-btn" data-tooltip="Collaborator" aria-label="Add collaborator">
+                <img src="./Assets/collaborator.svg" alt="Collaborator">
               </button>
-              <button type="button" class="icon-btn" data-tooltip="Add image (not in this demo)" aria-label="Add image">
-                <svg viewBox="0 0 24 24" width="18" height="18"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="8.5" cy="10" r="1.4" fill="currentColor"/><path d="M21 16l-5-5-9 9" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+              <button type="button" class="icon-btn" data-tooltip="Add image" aria-label="Add image">
+                <img src="./Assets/addImage.svg" alt="Add image">
               </button>
               <button type="button" class="icon-btn" id="composerArchiveBtn" data-tooltip="Archive" aria-label="Archive this note">
-                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M3 6h18v3H3zM5 9v11h14V9M10 13h4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+                <img src="./Assets/archive.svg" alt="Archive">
               </button>
-              <button type="button" class="icon-btn" data-tooltip="More options (not in this demo)" aria-label="More options">
-                <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg>
+              <button type="button" class="icon-btn" data-tooltip="More options" aria-label="More options">
+                <img src="./Assets/more.svg" alt="More options">
               </button>
-              <span class="composer__divider" aria-hidden="true"></span>
+
               <button type="button" class="icon-btn" id="composerUndoBtn" data-tooltip="Undo" aria-label="Undo" disabled>
-                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M8 7L4 11l4 4M4 11h10a6 6 0 010 12h-1" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <img src="./Assets/undo.svg" alt="Undo">
               </button>
               <button type="button" class="icon-btn" id="composerRedoBtn" data-tooltip="Redo" aria-label="Redo" disabled>
-                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M16 7l4 4-4 4M20 11H10a6 6 0 000 12h1" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <img src="./Assets/undo.svg" alt="Redo" class="flip-vertical">
               </button>
 
               <!-- Color popover -->

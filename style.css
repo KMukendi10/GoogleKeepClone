@@ -381,6 +381,10 @@ textarea, input { font-family: inherit; }
 .btn--text { color: var(--text); }
 .btn--text:hover { background: var(--bg-hover); }
 
+.flip-vertical {
+  transform: scaleX(-1);
+}
+
 /* ==========================================================================
    Color popover (used by both composer and modal)
    ========================================================================== */
