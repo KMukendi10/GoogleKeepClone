@@ -58,19 +58,19 @@
         <img src="./Assets/notes.svg" alt="Notes">
         <span class="sidebar__label">Notes</span>
       </button>
-      <button class="sidebar__item is-disabled" data-tooltip="Reminders (not in this demo)" aria-disabled="true">
+      <button class="sidebar__item" data-view="reminders" data-tooltip="Reminders">
         <img src="./Assets/reminders.svg" alt="Reminders">
         <span class="sidebar__label">Reminders</span>
       </button>
-      <button class="sidebar__item is-disabled" data-tooltip="Edit labels (not in this demo)" aria-disabled="true">
+      <button class="sidebar__item" id="editLabelsBtn" data-tooltip="Edit labels">
         <img src="./Assets/edit.svg" alt="Edit labels">
-        <span class="sidebar__label">Edit</span>
+        <span class="sidebar__label">Edit labels</span>
       </button>
       <button class="sidebar__item" data-view="archive" data-tooltip="Archive">
         <img src="./Assets/archive.svg" alt="">
         <span class="sidebar__label">Archive</span>
       </button>
-      <button class="sidebar__item is-disabled" data-tooltip="Trash (not in this demo)" aria-disabled="true">
+      <button class="sidebar__item" data-view="trash" data-tooltip="Trash">
         <img src="./Assets/delete.svg" alt="Trash">
         <span class="sidebar__label">Trash</span>
       </button>
@@ -82,6 +82,11 @@
       <!-- Composer: click to expand into a full note form -->
       <section class="composer" id="composer" aria-label="Create a new note">
         <form id="composerForm" class="composer__form" data-color="default">
+
+          <button type="button" class="icon-btn composer__pin-btn" id="composerPinBtn" data-tooltip="Pin note" aria-pressed="false" aria-label="Pin note">
+            <svg viewBox="0 0 24 24" width="19" height="19"><path d="M12 2l1.5 5.5L19 9l-4 3.5 1 5.5-4-2.8L8 18l1-5.5L5 9l5.5-1.5z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/></svg>
+          </button>
+
           <input
             type="text"
             id="composerTitle"
@@ -89,23 +94,59 @@
             placeholder="Title"
             autocomplete="off"
           />
-          <textarea
-            id="composerBody"
-            class="composer__body"
-            placeholder="Take a note…"
-            rows="1"
-          ></textarea>
 
-          <div class="composer__toolbar">
-            <div class="composer__quick-actions">
-              <button type="button" class="icon-btn" data-tooltip="New list" aria-label="New checklist">
-                <img src="./Assets/newlist.svg" alt="New List">
+          <!-- Collapsed & expanded both use this row: icons hide once expanded -->
+          <div class="composer__row">
+            <textarea
+              id="composerBody"
+              class="composer__body"
+              placeholder="Take a note…"
+              rows="1"
+            ></textarea>
+
+            <div class="composer__quick-icons">
+              <button type="button" class="icon-btn" id="composerListBtnCollapsed" data-tooltip="New list (not in this demo)" aria-label="New checklist">
+                <svg viewBox="0 0 24 24" width="19" height="19"><rect x="4" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M5.5 7l1 1 2-2" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 7h7M4 16h1.01M4 20h1.01M8 16h12M8 20h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
               </button>
-              <button type="button" class="icon-btn" id="composerColorBtn" data-tooltip="Background options" aria-label="Choose note color" aria-haspopup="true" aria-expanded="false">
+              <button type="button" class="icon-btn" id="composerColorBtnCollapsed" data-tooltip="Background options" aria-label="Choose note color">
                 <svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
               </button>
-              <button type="button" class="icon-btn" data-tooltip="Add image (not in this demo)" aria-label="Add image">
+              <button type="button" class="icon-btn" id="composerImageBtnCollapsed" data-tooltip="Add image (not in this demo)" aria-label="Add image">
                 <svg viewBox="0 0 24 24" width="19" height="19"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="8.5" cy="10" r="1.4" fill="currentColor"/><path d="M21 16l-5-5-9 9" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Expanded toolbar: full Keep-style icon row, only visible when open -->
+          <div class="composer__toolbar">
+            <div class="composer__quick-actions">
+              <button type="button" class="icon-btn" data-tooltip="Text formatting (not in this demo)" aria-label="Text formatting">
+                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 19L11 5h2l5 14M8 13h8" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="icon-btn" id="composerColorBtn" data-tooltip="Background options" aria-label="Choose note color" aria-haspopup="true" aria-expanded="false">
+                <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M12 3a4 4 0 100 8 2 2 0 010 4 6 6 0 000 8" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
+              </button>
+              <button type="button" class="icon-btn" id="composerReminderBtn" data-tooltip="Remind me" aria-label="Toggle reminder" aria-pressed="false">
+                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 3a5 5 0 0 0-5 5v3l-2 4h14l-2-4V8a5 5 0 0 0-5-5zM10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="icon-btn" data-tooltip="Collaborator (not in this demo)" aria-label="Add collaborator">
+                <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M18 8v6M15 11h6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+              </button>
+              <button type="button" class="icon-btn" data-tooltip="Add image (not in this demo)" aria-label="Add image">
+                <svg viewBox="0 0 24 24" width="18" height="18"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="8.5" cy="10" r="1.4" fill="currentColor"/><path d="M21 16l-5-5-9 9" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="icon-btn" id="composerArchiveBtn" data-tooltip="Archive" aria-label="Archive this note">
+                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M3 6h18v3H3zM5 9v11h14V9M10 13h4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="icon-btn" data-tooltip="More options (not in this demo)" aria-label="More options">
+                <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg>
+              </button>
+              <span class="composer__divider" aria-hidden="true"></span>
+              <button type="button" class="icon-btn" id="composerUndoBtn" data-tooltip="Undo" aria-label="Undo" disabled>
+                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M8 7L4 11l4 4M4 11h10a6 6 0 010 12h-1" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="icon-btn" id="composerRedoBtn" data-tooltip="Redo" aria-label="Redo" disabled>
+                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M16 7l4 4-4 4M20 11H10a6 6 0 000 12h1" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
 
               <!-- Color popover -->
@@ -122,7 +163,7 @@
 
       <!-- Empty state -->
       <div class="empty-state" id="emptyState" hidden>
-        <img src="./Assets/notes2.svg" alt="" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="120" height="120" class="empty-state__icon"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6v.5h5.4v-.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z" stroke="currentColor" stroke-width="1" fill="none" stroke-linejoin="round"/></svg>
         <p id="emptyStateText"></p>
       </div>
 
@@ -145,7 +186,7 @@
           <button class="icon-btn note-card__unarchive" data-tooltip="Restore" aria-label="Restore note" hidden>
             <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 20V9M6 14l6-6 6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
-          <button class="icon-btn note-card__delete" data-tooltip="Delete forever" aria-label="Delete note">
+          <button class="icon-btn note-card__delete" data-tooltip="Delete" aria-label="Delete note">
             <svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
@@ -168,16 +209,43 @@
         <button class="icon-btn" id="modalArchiveBtn" data-tooltip="Archive" aria-label="Archive note">
           <svg viewBox="0 0 24 24" width="19" height="19"><path d="M3 6h18v3H3zM5 9v11h14V9M10 13h4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
         </button>
+        <button class="icon-btn" id="modalRestoreBtn" data-tooltip="Restore" aria-label="Restore note" hidden>
+          <svg viewBox="0 0 24 24" width="19" height="19"><path d="M12 20V9M6 14l6-6 6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" id="modalReminderBtn" data-tooltip="Remind me" aria-label="Toggle reminder" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="19" height="19"><path d="M12 3a5 5 0 0 0-5 5v3l-2 4h14l-2-4V8a5 5 0 0 0-5-5zM10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        </button>
         <button class="icon-btn" id="modalColorBtn" data-tooltip="Background options" aria-label="Choose note color" aria-haspopup="true" aria-expanded="false">
           <svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
         </button>
-        <button class="icon-btn" id="modalDeleteBtn" data-tooltip="Delete forever" aria-label="Delete note">
+        <button class="icon-btn" id="modalDeleteBtn" data-tooltip="Delete" aria-label="Delete note">
           <svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <div class="color-popover color-popover--modal" id="modalColorPopover" hidden>
           <div class="composer__colors" id="modalColors" role="radiogroup" aria-label="Note color"></div>
         </div>
         <button class="btn btn--text" id="modalCloseBtn" style="margin-left:auto;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== EDIT LABELS MODAL ===================== -->
+  <div class="modal-overlay" id="labelsModalOverlay" hidden>
+    <div class="modal labels-modal" role="dialog" aria-modal="true" aria-labelledby="labelsModalTitle">
+      <h2 id="labelsModalTitle" class="labels-modal__title">Edit labels</h2>
+
+      <form id="labelsForm" class="labels-modal__form">
+        <label for="newLabelInput" class="visually-hidden">Create new label</label>
+        <input type="text" id="newLabelInput" placeholder="Create new label" autocomplete="off" maxlength="40" />
+        <button type="submit" class="icon-btn" data-tooltip="Add label" aria-label="Add label">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </form>
+
+      <ul class="labels-modal__list" id="labelsList" aria-label="Your labels"></ul>
+
+      <div class="modal__footer" style="border-top: none;">
+        <button class="btn btn--text" id="labelsModalDoneBtn" style="margin-left:auto;">Done</button>
       </div>
     </div>
   </div>

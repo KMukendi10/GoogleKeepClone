@@ -174,7 +174,7 @@ textarea, input { font-family: inherit; }
 [data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%) translateY(4px);
   background: #3c4043;
@@ -240,8 +240,6 @@ textarea, input { font-family: inherit; }
 }
 .sidebar__item.is-active svg { color: #684b00; }
 
-.sidebar__item.is-disabled { color: var(--text-faint); cursor: pointer; }
-
 .sidebar__item svg { flex-shrink: 0; }
 
 .sidebar__label {
@@ -270,12 +268,30 @@ textarea, input { font-family: inherit; }
   box-shadow: var(--shadow-card);
   padding: 12px 16px;
   transition: box-shadow var(--transition);
+  position: relative;
 }
 
 .composer__form:focus-within { box-shadow: var(--shadow-card-hover); }
 
+/* Pin button only appears once the composer is expanded */
+.composer__pin-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 30px;
+  height: 30px;
+  display: none;
+}
+.composer.is-open .composer__pin-btn { display: inline-flex; }
+
+/* Generic "pressed/active" look for any toggle icon button (pin, reminder) */
+.icon-btn[aria-pressed="true"] { color: var(--text); }
+.icon-btn[aria-pressed="true"] svg { fill: currentColor; }
+
+/* Title is hidden in the collapsed, single-line state and only shown
+   once the composer is expanded (matches Google Keep's behavior) */
 .composer__title {
-  display: block;
+  display: none;
   width: 100%;
   border: none;
   background: transparent;
@@ -283,11 +299,32 @@ textarea, input { font-family: inherit; }
   font-weight: 500;
   color: var(--text);
   margin-bottom: 2px;
+  padding-right: 36px;
 }
+.composer.is-open .composer__title { display: block; }
 .composer__title:focus { outline: none; }
+
+/* Collapsed row: textarea + the 3 quick-action icons side by side.
+   Once expanded, the icons hide and the full toolbar below takes over. */
+.composer__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.composer__quick-icons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.composer__quick-icons .icon-btn { width: 32px; height: 32px; }
+.composer.is-open .composer__quick-icons { display: none; }
 
 .composer__body {
   display: block;
+  flex: 1;
+  min-width: 0;
   width: 100%;
   border: none;
   background: transparent;
@@ -315,6 +352,19 @@ textarea, input { font-family: inherit; }
   gap: 2px;
   position: relative;
 }
+
+.composer__divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 0 6px;
+  background: var(--border-strong);
+}
+
+.icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.icon-btn:disabled:hover { background: transparent; }
 
 .composer__actions { display: flex; align-items: center; gap: 4px; }
 
@@ -397,12 +447,6 @@ textarea, input { font-family: inherit; }
   text-align: center;
   color: var(--text-faint);
   margin-top: 100px;
-}
-
-.empty-state img {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 12px;
 }
 /* Our own `display: flex` above otherwise beats the browser's built-in
    `[hidden] { display: none }` rule, so the icon never actually hides
@@ -534,6 +578,61 @@ textarea, input { font-family: inherit; }
   position: relative;
   border-top: 1px solid var(--border);
   margin-top: 6px;
+}
+
+/* ==========================================================================
+   Edit labels modal
+   ========================================================================== */
+.labels-modal { max-width: 380px; padding-top: 20px; }
+
+.labels-modal__title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 4px 0 16px;
+  color: var(--text);
+}
+
+.labels-modal__form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+  margin-bottom: 6px;
+}
+
+.labels-modal__form input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text);
+  padding: 6px 4px;
+}
+.labels-modal__form input:focus { outline: none; }
+
+.labels-modal__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.labels-modal__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.labels-modal__empty {
+  padding: 14px 4px;
+  color: var(--text-faint);
+  font-size: 13px;
 }
 
 /* ==========================================================================
